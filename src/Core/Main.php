@@ -8,6 +8,16 @@ use SHSign\Tools\Cache;
 class Main extends BasicSHSign {
 
     /**
+     * access token
+     * @var string
+     */
+    private $_token = '';
+
+    public function setToken($token) {
+        $this->_token = $token;
+    }
+
+    /**
      * 获取access token
      *
      * @return mixed
@@ -30,11 +40,15 @@ class Main extends BasicSHSign {
      * Author: DQ
      */
     protected function getToken() {
-        $token = Cache::getCache('token');
+        $token = $this->_token;
         if (empty($token)) {
-            $data = $this->getAccessToken();
-            Cache::setCache('token', $data['access_token'], intval($data['expires_in']) - 20);
-            $token = $data['access_token'];
+            $token = Cache::getCache('token');
+            if (empty($token)) {
+                $data = $this->getAccessToken();
+                Cache::setCache('token', $data['access_token'], intval($data['expires_in']) - 20);
+                $token = $data['access_token'];
+            }
+            $this->_token = $token;
         }
 
         return $token;
@@ -76,7 +90,7 @@ class Main extends BasicSHSign {
         $url  = $this->getUrl('/business/commonhouse/openapi/getContractSeqNo');
         $data = [
             'access_token'      => $this->getToken(),
-            'companyId'         => $this->config['companyCode'],
+            'companyId'         => $this->config['companyId'],
             'companyName'       => $this->config['companyName'],
             'PID'               => $pId,
             'projectName'       => $projectName,
@@ -95,6 +109,7 @@ class Main extends BasicSHSign {
      *
      * @param string $pId
      * @param string $projectName
+     * @param string $HID                 房源ID
      * @param array  $contractInfo        合同信息
      * @param array  $uploadTenantBean    承租人信息
      * @param array  $uploadHouseInfoBean 房屋信息
@@ -105,20 +120,24 @@ class Main extends BasicSHSign {
      * @throws \SHSign\Exceptions\LocalCacheException
      * Author: DQ
      */
-    public function uploadContract($pId = '', $projectName = '', $contractInfo = [], $uploadTenantBean = [], $uploadHouseInfoBean = [], $togetherList = []) {
-        $url = $this->getUrl('/business/commonhouse/openapi/uploadContract');
-        if (!is_array($togetherList[0])) {
-            $togetherList[0] = $togetherList;
+    public function uploadContract($pId = '', $projectName = '', $HID = '', $contractInfo = [], $uploadTenantBean = [], $uploadHouseInfoBean = [], $togetherList = []) {
+        $url      = $this->getUrl('/business/commonhouse/openapi/uploadContract');
+        $together = [];
+        if (!isset($togetherList[0])) {
+            $together[0] = $togetherList;
+        } else {
+            $together = $togetherList;
         }
 
         $data    = [
-            'companyId'           => $this->config['companyCode'],
+            'companyId'           => $this->config['companyId'],
             'companyName'         => $this->config['companyName'],
             'PID'                 => $pId,
+            'HID'                 => $HID,
             'projectName'         => $projectName,
             'uploadTenantBean'    => $uploadTenantBean,
             'uploadHouseInfoBean' => $uploadHouseInfoBean,
-            'togetherList'        => $togetherList
+            'togetherList'        => $together
         ];
         $data    = array_merge($data, $contractInfo);
         $headers = [
@@ -141,11 +160,11 @@ class Main extends BasicSHSign {
      * @throws \ErrorException
      * Author: DQ
      */
-    public function returnContrart($pId = '', $projectName = '', $HID, $contractNO) {
+    public function returnContract($pId = '', $projectName = '', $HID, $contractNO) {
         $url     = $this->getUrl('/business/commonhouse/openapi/returnContrart');
         $data    = [
             'access_token' => $this->getToken(),
-            'companyId'    => $this->config['companyCode'],
+            'companyId'    => $this->config['companyId'],
             'companyName'  => $this->config['companyName'],
             'PID'          => $pId,
             'projectName'  => $projectName,
@@ -164,8 +183,8 @@ class Main extends BasicSHSign {
      *
      * @param string $pId                 项目ID
      * @param string $projectName         项目名称
-     * @param        $HID                 房源ID
-     * @param        $contractNO          合同编号
+     * @param string $HID                 房源ID
+     * @param string $contractNO          合同编号
      * @param array  $returnhouseInfoBean 房源信息
      *
      * @return mixed
@@ -173,10 +192,10 @@ class Main extends BasicSHSign {
      * @throws \SHSign\Exceptions\LocalCacheException
      * Author: DQ
      */
-    public function confirmReturnContrart($pId = '', $projectName = '', $HID, $contractNO, $returnhouseInfoBean = []) {
-        $url     = $this->getUrl('/business/commonhouse/openapi/uploadContract');
+    public function confirmReturnContrart($pId = '', $projectName = '', $HID = '', $contractNO = '', $returnhouseInfoBean = []) {
+        $url     = $this->getUrl('/business/commonhouse/openapi/confirmReturnContrart');
         $data    = [
-            'companyId'           => $this->config['companyCode'],
+            'companyId'           => $this->config['companyId'],
             'companyName'         => $this->config['companyName'],
             'PID'                 => $pId,
             'projectName'         => $projectName,
@@ -195,20 +214,21 @@ class Main extends BasicSHSign {
     /**
      * 续租确认并改变房源状态
      *
-     * @param string $pId           项目ID
-     * @param string $projectName   项目名称
-     * @param        $HID           房源ID
-     * @param        $contractNO    合同编号
+     * @param string $pId         项目ID
+     * @param string $projectName 项目名称
+     * @param string $HID         房源ID
+     * @param string $contractNO  合同编号
      *
      * @return mixed
      * @throws \ErrorException
+     * @throws \SHSign\Exceptions\LocalCacheException
      * Author: DQ
      */
-    public function confirmResignContract($pId = '', $projectName = '', $HID, $contractNO) {
+    public function confirmResignContract($pId = '', $projectName = '', $HID = '', $contractNO = '') {
         $url     = $this->getUrl('/business/commonhouse/openapi/confirmResignContract');
         $data    = [
             'access_token' => $this->getToken(),
-            'companyId'    => $this->config['companyCode'],
+            'companyId'    => $this->config['companyId'],
             'companyName'  => $this->config['companyName'],
             'PID'          => $pId,
             'projectName'  => $projectName,
@@ -229,8 +249,8 @@ class Main extends BasicSHSign {
      *
      * @param string $pId           项目ID
      * @param string $projectName   项目名称
-     * @param        $HID           房源ID
-     * @param        $contractNO    合同编号
+     * @param string $HID           房源ID
+     * @param string $contractNO    合同编号
      * @param array  $oldTenantList 原承租人信息列表
      * @param array  $newTenantList 新承租人信息列表
      *
@@ -239,25 +259,31 @@ class Main extends BasicSHSign {
      * @throws \SHSign\Exceptions\LocalCacheException
      * Author: DQ
      */
-    public function changeTenant($pId = '', $projectName = '', $HID, $contractNO, $oldTenantList = [], $newTenantList = []) {
+    public function changeTenant($pId = '', $projectName = '', $HID = '', $contractNO = '', $oldTenantList = [], $newTenantList = []) {
         $url = $this->getUrl('/business/commonhouse/openapi/changeTenant');
-        if (!is_array($oldTenantList[0])) {
-            $oldTenantList[0] = $oldTenantList;
+        $old = [];
+        if (!isset($oldTenantList[0])) {
+            $old[0] = $oldTenantList;
+        } else {
+            $old = $oldTenantList;
         }
-        if (!is_array($newTenantList[0])) {
-            $newTenantList[0] = $newTenantList;
+        $new = [];
+        if (!isset($newTenantList[0])) {
+            $new[0] = $newTenantList;
+        } else {
+            $new = $newTenantList;
         }
 
         $data    = [
-            'companyId'         => $this->config['companyCode'],
+            'companyId'         => $this->config['companyId'],
             'companyName'       => $this->config['companyName'],
             'PID'               => $pId,
             'projectName'       => $projectName,
             'HID'               => $HID,
             'contractNO'        => $contractNO,
             'contractAttribute' => '02',
-            'oldTenantList'     => $oldTenantList,
-            'newTenantList'     => $newTenantList
+            'oldTenantList'     => $old,
+            'newTenantList'     => $new
         ];
         $headers = [
             'Content-Type' => 'application/json',

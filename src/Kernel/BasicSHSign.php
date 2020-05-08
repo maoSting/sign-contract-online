@@ -36,6 +36,15 @@ class BasicSHSign {
         if (empty($options['password'])) {
             throw new InvalidArgumentException('miss config [password]');
         }
+        if (empty($options['companyId'])) {
+            throw new InvalidArgumentException('miss config [companyId]');
+        }
+        if (empty($options['companyCode'])) {
+            throw new InvalidArgumentException('miss config [companyCode]');
+        }
+        if (empty($options['companyName'])) {
+            throw new InvalidArgumentException('miss config [companyName]');
+        }
         if (empty($options['url'])) {
             throw new InvalidArgumentException('miss config [url]');
         }
@@ -66,7 +75,6 @@ class BasicSHSign {
     public function getUrl($uri = '') {
         return sprintf("%s%s", $this->config['url'], $uri);
     }
-
 
     /**
      * 注册请求
@@ -128,6 +136,7 @@ class BasicSHSign {
         try {
             $this->registerApi(__FUNCTION__, func_get_args());
             $response = RequestTool::post($url, $data, $headers);
+
             return DataTransform::json2arr($response);
         } catch (InvalidResponseException $e) {
             if (!$this->_isTry) {
@@ -141,6 +150,5 @@ class BasicSHSign {
             throw new InvalidResponseException($e->getMessage(), $e->getCode());
         }
     }
-
 
 }

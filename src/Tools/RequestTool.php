@@ -144,17 +144,22 @@ class RequestTool {
      */
     private static function _handlerHttpResponse(Curl $request) {
         $msg = json_decode($request->getRawResponse(), true);
-        $str = isset($msg['message']) ? $msg['message'] : '';
-        switch ($msg['code']) {
-            case -1:
-                throw new InvalidResponseException('认证失败.' . $str, -1);
-                break;
-            case -2:
-                throw new InvalidResponseException('参数不能为空.' . $str, -2);
-                break;
-            case -10:
-                throw new InvalidResponseException('操作失败.' . $str, -10);
-                break;
+        $str = isset($msg['message'])?$msg['message']:'';
+        switch ($request->httpStatusCode){
+            case 400:
+                throw new InvalidResponseException('Bad Request(请求参数不合法).'.$str, 400);break;
+            case 401:
+                throw new InvalidResponseException('Unauthorized(认证不通过或访问令牌失效).'.$str, 401);break;
+            case 403:
+                throw new InvalidResponseException('Forbidden(访问无权限).'.$str, 403);break;
+            case 404:
+                throw new InvalidResponseException('Not Found().'.$str, 404);break;
+            case 409:
+                throw new InvalidResponseException('Conflict(业务异常情况返回该状态码).'.$str, 409);break;
+            case 500:
+                throw new InvalidResponseException('Internal Server Error(服务异常).'.$str, 500);break;
+            case 502:
+                throw new InvalidResponseException('Bad Gateway(网关错误).'.$str, 502);break;
         }
     }
 

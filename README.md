@@ -17,6 +17,9 @@
 ## TODO
 a lot
 
+## TEST
+>> ./vendor/bin/phpunit --configuration phpunit.xml
+
 ## License
 
 MIT

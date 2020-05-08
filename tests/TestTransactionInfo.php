@@ -7,22 +7,20 @@ use SHSign\Core\Main;
 class TestTransactionInfo extends BasicTest {
 
     /**
-     *
-     * @todo 未测试
+     * @todo 获取资格
      *
      * @throws \BYRobot\Exceptions\InvalidResponseException
-     * @throws \ErrorException
-     * Author: DQ
+     * @throws \ErrorExcep
+     *
      */
-    public function testGetAccessToken(){
-        $companyLib = new Main($this->_config);
-        try{
-            $return = $companyLib->getTransactionInfo('371326199202086419');
-        }catch (\Exception $e){
-            var_dump($e->getMessage());
+    public function testGetTransactionInfo() {
+        try {
+            $mainLib = new Main($this->_config);
+            $return  = $mainLib->getTransactionInfo('371324199002086021');
+            $this->assertNotEmpty($return, '提供申请资格证书信息至运营公司');
+        } catch (\Exception $e) {
+            $this->assertEmpty($e->getMessage(), $e->getMessage());
         }
-//        $this->assertNotFalse(isset($return['access_token']), '获取access_token失败');
     }
-
 
 }

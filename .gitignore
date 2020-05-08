@@ -2,4 +2,6 @@
 composer.lock
 vendor
 Cache
+.phpunit.result.cache
 tests/config.php
+tests/data.php
