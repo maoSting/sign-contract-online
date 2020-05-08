@@ -2,7 +2,6 @@
 
 namespace SHSign\Core;
 
-use SHSign\Exceptions\InvalidArgumentException;
 use SHSign\Kernel\BasicSHSign;
 use SHSign\Tools\Cache;
 
@@ -107,7 +106,11 @@ class Main extends BasicSHSign {
      * Author: DQ
      */
     public function uploadContract($pId = '', $projectName = '', $contractInfo = [], $uploadTenantBean = [], $uploadHouseInfoBean = [], $togetherList = []) {
-        $url     = $this->getUrl('/business/commonhouse/openapi/uploadContract');
+        $url = $this->getUrl('/business/commonhouse/openapi/uploadContract');
+        if (!is_array($togetherList[0])) {
+            $togetherList[0] = $togetherList;
+        }
+
         $data    = [
             'companyId'           => $this->config['companyCode'],
             'companyName'         => $this->config['companyName'],
@@ -221,8 +224,47 @@ class Main extends BasicSHSign {
 
     /**
      *
-     * @todo 编辑合同信息
+     * 单位合同的履行期间的承租人（主申请人）或同住人（配偶/子女）变更接口
+     * 仅接受单位合同请求
      *
+     * @param string $pId           项目ID
+     * @param string $projectName   项目名称
+     * @param        $HID           房源ID
+     * @param        $contractNO    合同编号
+     * @param array  $oldTenantList 原承租人信息列表
+     * @param array  $newTenantList 新承租人信息列表
+     *
+     * @return mixed
+     * @throws \ErrorException
+     * @throws \SHSign\Exceptions\LocalCacheException
+     * Author: DQ
      */
+    public function changeTenant($pId = '', $projectName = '', $HID, $contractNO, $oldTenantList = [], $newTenantList = []) {
+        $url = $this->getUrl('/business/commonhouse/openapi/changeTenant');
+        if (!is_array($oldTenantList[0])) {
+            $oldTenantList[0] = $oldTenantList;
+        }
+        if (!is_array($newTenantList[0])) {
+            $newTenantList[0] = $newTenantList;
+        }
+
+        $data    = [
+            'companyId'         => $this->config['companyCode'],
+            'companyName'       => $this->config['companyName'],
+            'PID'               => $pId,
+            'projectName'       => $projectName,
+            'HID'               => $HID,
+            'contractNO'        => $contractNO,
+            'contractAttribute' => '02',
+            'oldTenantList'     => $oldTenantList,
+            'newTenantList'     => $newTenantList
+        ];
+        $headers = [
+            'Content-Type' => 'application/json',
+            'access_token' => $this->getToken(),
+        ];
+
+        return $this->httpPostJson($url, $data, $headers);
+    }
 
 }

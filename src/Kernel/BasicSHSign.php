@@ -10,7 +10,7 @@ use SHSign\Tools\RequestTool;
 
 class BasicSHSign {
 
-    const VERSION = '1.4';
+    const VERSION = '1.4.5';
 
     public $config;
 
