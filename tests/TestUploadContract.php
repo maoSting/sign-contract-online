@@ -15,9 +15,10 @@ class TestUploadContract extends BasicTest {
     public function testUploadContract() {
         try {
             $mainLib             = new Main($this->_config);
-            $pid                 = '0285';
-            $projectName         = '龙南佳苑';
-            $HID                 = '02852019120225149_31';
+            $pid                 = $this->_data['PID'];
+            $projectName         = $this->_data['projectName'];
+            $HID                 = $this->_data['HID'];
+
             $contractInfo        = [
                 "contractNO"         => "201901300650100001",
                 "contractAttribute"  => "01",
