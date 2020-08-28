@@ -128,6 +128,38 @@ class Main extends BasicSHSign {
         } else {
             $together = $togetherList;
         }
+        $emptyTenantBean  = [
+            "transactionNo"    => "",
+            "name"             => "",
+            "sex"              => "",
+            "nation"           => "",
+            "birthday"         => "",
+            "address"          => "",
+            "cardNo"           => "",
+            "age"              => "",
+            "registeredRight"  => "",
+            "registeredType"   => "",
+            "mobile"           => "",
+            "telephone"        => "",
+            "email"            => "",
+            "education"        => "",
+            "livingCardNo"     => "",
+            "livingCardTime"   => "",
+            "bankAccount"      => "",
+            "bank"             => "",
+            "bankProxy"        => "",
+            "companyName"      => "",
+            "contact"          => "",
+            "taxpayerAddress"  => "",
+            "taxpayerMobile"   => "",
+            "companyPartition" => "",
+            "workPartition"    => "",
+            "zip"              => "",
+            "remark"           => "",
+            "livingStartTime"  => "",
+            "livingStatus"     => ""
+        ];
+        $uploadTenantBean = array_merge($emptyTenantBean, $uploadTenantBean);
 
         $data    = [
             'companyId'           => $this->config['companyId'],
