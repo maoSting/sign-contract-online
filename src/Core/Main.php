@@ -121,13 +121,8 @@ class Main extends BasicSHSign {
      * Author: DQ
      */
     public function uploadContract($pId = '', $projectName = '', $HID = '', $contractInfo = [], $uploadTenantBean = [], $uploadHouseInfoBean = [], $togetherList = []) {
-        $url      = $this->getUrl('/business/commonhouse/openapi/uploadContract');
-        $together = [];
-        if (!isset($togetherList[0])) {
-            $together[0] = $togetherList;
-        } else {
-            $together = $togetherList;
-        }
+        $url = $this->getUrl('/business/commonhouse/openapi/uploadContract');
+
         $emptyTenantBean  = [
             "transactionNo"    => "",
             "name"             => "",
@@ -161,7 +156,7 @@ class Main extends BasicSHSign {
         ];
         $uploadTenantBean = array_merge($emptyTenantBean, $uploadTenantBean);
 
-        $data    = [
+        $data = [
             'companyId'           => $this->config['companyId'],
             'companyName'         => $this->config['companyName'],
             'PID'                 => $pId,
@@ -169,8 +164,10 @@ class Main extends BasicSHSign {
             'projectName'         => $projectName,
             'uploadTenantBean'    => $uploadTenantBean,
             'uploadHouseInfoBean' => $uploadHouseInfoBean,
-            'togetherList'        => $together
         ];
+        if ($togetherList) {
+            $data['togetherList'] = $togetherList;
+        }
         $data    = array_merge($data, $contractInfo);
         $headers = [
             'Content-Type' => 'application/json',
