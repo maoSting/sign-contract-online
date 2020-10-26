@@ -39,7 +39,7 @@ class Main extends BasicSHSign {
      * @throws \SHSign\Exceptions\LocalCacheException
      * Author: DQ
      */
-    protected function getToken() {
+    public function getToken() {
         $token = $this->_token;
         if (empty($token)) {
             $token = Cache::getCache('token');

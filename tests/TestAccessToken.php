@@ -13,11 +13,16 @@ class TestAccessToken extends BasicTest {
      * @throws \ErrorException
      * Author: DQ
      */
-    public function testGetAccessToken(){
+    public function testGetAccessToken() {
         $companyLib = new Main($this->_config);
-        $return = $companyLib->getAccessToken();
+        $return     = $companyLib->getAccessToken();
         $this->assertNotFalse(isset($return['access_token']), '获取access_token失败');
     }
 
+    public function testGetToken() {
+        $companyLib = new Main($this->_config);
+        $token      = $companyLib->getToken();
+        $this->assertNotEmpty($token, '获取token失败');
+    }
 
 }
